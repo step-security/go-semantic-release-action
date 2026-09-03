@@ -36083,6 +36083,7 @@ var __importStar = (this && this.__importStar) || (function () {
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const fs_1 = __nccwpck_require__(9896);
 const fsSync = __importStar(__nccwpck_require__(9896));
+const crypto_1 = __nccwpck_require__(6982);
 const os_1 = __nccwpck_require__(857);
 const core = __importStar(__nccwpck_require__(7484));
 const exec = __importStar(__nccwpck_require__(5236));
@@ -36134,11 +36135,22 @@ function getPlatformArch(a, p) {
     };
     return (platform[p] ? platform[p] : p) + '/' + (arch[a] ? arch[a] : a);
 }
+async function verifyChecksum(filePath, checksumUrl) {
+    const response = await axios_1.default.get(checksumUrl, { timeout: 10000, responseType: 'text' });
+    const expectedHash = response.data.trim().split(/\s+/)[0].toLowerCase();
+    const actualHash = (0, crypto_1.createHash)('sha256').update(await fs_1.promises.readFile(filePath)).digest('hex');
+    if (actualHash !== expectedHash) {
+        throw new Error(`Checksum verification failed for semantic-release binary.\nExpected: ${expectedHash}\nGot:      ${actualHash}`);
+    }
+    core.info('Binary checksum verified');
+}
 async function installLatestSemRelVersion() {
     core.info('downloading semantic-release binary...');
-    const path = await tc.downloadTool(`https://registry.go-semantic-release.xyz/downloads/${getPlatformArch((0, os_1.arch)(), (0, os_1.platform)())}/semantic-release`);
-    await fs_1.promises.chmod(path, '0755');
-    return path;
+    const binaryUrl = `https://registry.go-semantic-release.xyz/downloads/${getPlatformArch((0, os_1.arch)(), (0, os_1.platform)())}/semantic-release`;
+    const filePath = await tc.downloadTool(binaryUrl);
+    await fs_1.promises.chmod(filePath, '0755');
+    await verifyChecksum(filePath, `${binaryUrl}.sha256`);
+    return filePath;
 }
 function getBooleanInput(name) {
     const inputValue = core.getInput(name);
@@ -36207,6 +36219,7 @@ async function main() {
         }
         catch (error) {
             if (/exit code 6\d/.test(error.message)) {
+                core.info('semantic-release exited without creating a release');
                 return;
             }
             core.setFailed(error.message);
