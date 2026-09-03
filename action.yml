@@ -1,0 +1,61 @@
+name: 'go-semantic-release'
+description: 'fully automated package/module/image publishing'
+branding:
+  icon: 'package'
+  color: 'blue'
+inputs:
+  github-token:
+    description: 'github token'
+    required: false
+  changelog-file:
+    description: 'creates a changelog file'
+    required: false
+  ghr:
+    description: 'create a .ghr file with the parameters for tcnksm/ghr'
+    required: false
+  update-file:
+    description: 'updates the version of a certain file'
+    required: false
+  dry:
+    description: 'do not create release'
+    required: false
+  prerelease:
+    description: 'flags the release as a prerelease'
+    required: false
+  prepend:
+    description: 'flag changes to be prepended into the changelog'
+    required: false
+  allow-initial-development-versions:
+    description: 'starts your initial development release at 0.1.0'
+    required: false
+  force-bump-patch-version:
+    description: 'increments the patch version if no changes are found'
+    required: false
+  changelog-generator-opt:
+    description: 'options that are passed to the changelog-generator plugin'
+    required: false
+  custom-arguments:
+    description: 'custom arguments that are passed directly to the semantic-release cli'
+    required: false
+  hooks:
+    description: 'enable hooks plugins for semantic release'
+    required: false
+  bin:
+    description: 'optional path to the semantic-release binary'
+    required: false
+outputs:
+  version:
+    description: 'the version of the created release'
+  version_major:
+    description: 'the major version of the created release'
+  version_minor:
+    description: 'the minor version of the created release'
+  version_patch:
+    description: 'the patch version of the created release'
+  version_prerelease:
+    description: 'the prerelease version of the created release'
+  changelog:
+    description: 'the generated release changelog'
+runs:
+  using: 'node24'
+  main: 'dist/index.js'

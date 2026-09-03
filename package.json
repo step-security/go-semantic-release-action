@@ -1,0 +1,31 @@
+{
+  "name": "go-semantic-release-action",
+  "version": "1.24.1",
+  "main": "src/index.ts",
+  "scripts": {
+    "test": "eslint src/** && tsc --noEmit ./src/index.ts",
+    "fix": "eslint --fix src/**",
+    "build": "ncc build ./src/index.ts -o dist"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "@actions/core": "^1.11.1",
+    "@actions/exec": "^1.1.1",
+    "@actions/tool-cache": "^2.0.2",
+    "axios": "^1.20.0",
+    "semver": "^7.7.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.17.16",
+    "@types/semver": "^7.8.0",
+    "@typescript-eslint/eslint-plugin": "^7.18.0",
+    "@typescript-eslint/parser": "^7.18.0",
+    "@vercel/ncc": "^0.38.3",
+    "eslint": "^8.57.1",
+    "eslint-config-standard": "^17.1.0",
+    "eslint-plugin-import": "^2.31.0",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-promise": "^6.6.0",
+    "typescript": "^5.7.3"
+  }
+}
