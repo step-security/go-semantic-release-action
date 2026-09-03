@@ -1,6 +1,5 @@
 import { promises as fs } from 'fs'
 import * as fsSync from 'fs'
-import { createHash } from 'crypto'
 import { arch, platform } from 'os'
 
 import * as core from '@actions/core'
@@ -60,23 +59,11 @@ function getPlatformArch (a: string, p: string): string {
   return (platform[p] ? platform[p] : p) + '/' + (arch[a] ? arch[a] : a)
 }
 
-async function verifyChecksum (filePath: string, checksumUrl: string): Promise<void> {
-  const response = await axios.get<string>(checksumUrl, { timeout: 10000, responseType: 'text' })
-  const expectedHash = response.data.trim().split(/\s+/)[0].toLowerCase()
-  const actualHash = createHash('sha256').update(await fs.readFile(filePath)).digest('hex')
-  if (actualHash !== expectedHash) {
-    throw new Error(`Checksum verification failed for semantic-release binary.\nExpected: ${expectedHash}\nGot:      ${actualHash}`)
-  }
-  core.info('Binary checksum verified')
-}
-
 async function installLatestSemRelVersion (): Promise<string> {
   core.info('downloading semantic-release binary...')
-  const binaryUrl = `https://registry.go-semantic-release.xyz/downloads/${getPlatformArch(arch(), platform())}/semantic-release`
-  const filePath = await tc.downloadTool(binaryUrl)
-  await fs.chmod(filePath, '0755')
-  await verifyChecksum(filePath, `${binaryUrl}.sha256`)
-  return filePath
+  const path = await tc.downloadTool(`https://registry.go-semantic-release.xyz/downloads/${getPlatformArch(arch(), platform())}/semantic-release`)
+  await fs.chmod(path, '0755')
+  return path
 }
 
 function getBooleanInput (name: string): boolean {
